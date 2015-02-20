@@ -116,6 +116,27 @@ class SchemaToolTest extends \Doctrine\Tests\OrmTestCase
 
         $this->assertSame(array(), $customSchemaOptions);
     }
+
+    /**
+     * @group DDC-3577
+     */
+    public function testInheritedAssociationShouldBeSupported()
+    {
+        $em = $this->_getTestEntityManager();
+        $schemaTool = new SchemaTool($em);
+
+        $classes = array(
+            $em->getClassMetadata('Doctrine\Tests\Models\DDC3577\Article'),
+            $em->getClassMetadata('Doctrine\Tests\Models\DDC3577\Interview'),
+            $em->getClassMetadata('Doctrine\Tests\Models\DDC3577\Post'),
+            $em->getClassMetadata('Doctrine\Tests\Models\DDC3577\User'),
+        );
+
+        $schema = $schemaTool->getSchemaFromMetadata($classes);
+
+        $this->assertTrue($schema->getTable('ddc3577_articles')->hasColumn('user_id'), 'Table "ddc3577_articles" should has column "user_id".');
+        $this->assertTrue($schema->getTable('ddc3577_interviews')->hasColumn('user_id'), 'Table "ddc3577_interviews" should has column "user_id".');
+    }
 }
 
 /**
